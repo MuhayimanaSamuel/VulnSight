@@ -1,0 +1,6 @@
+{
+  "name": "VulnSight",
+  "description": "DevSecOps vulnerability assessment dashboard and microservices scanner with real-time port auditing, banner grabbing, and CVE risk intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

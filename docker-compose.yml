@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # =========================================================================
+  # 1. Main Gateway & Presentation Service (Node.js Express + React 19)
+  # =========================================================================
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vulnsight-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SCANNER_SERVICE_URL=http://scanner-engine:8000
+    depends_on:
+      scanner-engine:
+        condition: service_healthy
+    networks:
+      - vulnsight-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  # =========================================================================
+  # 2. Security Scanner Engine (Python FastAPI + Async Sockets + CVE Intelligence)
+  # =========================================================================
+  scanner-engine:
+    build:
+      context: ./services/scanner-engine
+      dockerfile: Dockerfile
+    container_name: vulnsight-engine
+    expose:
+      - "8000"
+    networks:
+      - vulnsight-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+
+networks:
+  vulnsight-network:
+    name: vulnsight-internal-net
+    driver: bridge
